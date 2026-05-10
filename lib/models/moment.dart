@@ -1,0 +1,37 @@
+class Moment {
+  String id;
+  String imagePath;
+  String caption;
+  DateTime date;
+  String? petId;
+
+  Moment({
+    required this.id,
+    required this.imagePath,
+    required this.caption,
+    required this.date,
+    this.petId,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      "id": id,
+      "imagePath": imagePath,
+      "caption": caption,
+      "date": date.toIso8601String(),
+      "petId": petId,
+    };
+  }
+
+  factory Moment.fromMap(Map map) {
+    return Moment(
+      id: map['id']?.toString() ?? '',
+      imagePath: map['imagePath']?.toString() ?? '',
+      caption: map['caption']?.toString() ?? '',
+      date: map['date'] != null
+          ? DateTime.parse(map['date'].toString())
+          : DateTime.now(),
+      petId: map['petId']?.toString(),
+    );
+  }
+}

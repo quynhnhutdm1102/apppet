@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'home_screen.dart';
+import 'main_screen.dart';
 
 class WelcomeScreen extends StatelessWidget {
   @override
@@ -47,7 +47,7 @@ class WelcomeScreen extends StatelessWidget {
                   ElevatedButton(
                     onPressed: () => Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (_) => HomeScreen()),
+                      MaterialPageRoute(builder: (_) => MainScreen()),
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.orangeAccent,

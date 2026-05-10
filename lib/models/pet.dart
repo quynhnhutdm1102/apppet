@@ -7,6 +7,9 @@ class Pet {
   String image;
   List<Map<String, dynamic>> reminders;
   List<double> weightHistory;
+  List<Map<String, dynamic>> vaccines;
+  List<Map<String, dynamic>> dewormings;
+  List<String> diseases;
 
   Pet({
     required this.id,
@@ -17,8 +20,14 @@ class Pet {
     required this.image,
     List<Map<String, dynamic>>? reminders,
     List<double>? weightHistory,
+    List<Map<String, dynamic>>? vaccines,
+    List<Map<String, dynamic>>? dewormings,
+    List<String>? diseases,
   }) : this.reminders = reminders ?? [],
-       this.weightHistory = weightHistory ?? [weight];
+       this.weightHistory = weightHistory ?? [weight],
+       this.vaccines = vaccines ?? [],
+       this.dewormings = dewormings ?? [],
+       this.diseases = diseases ?? [];
 
   Map<String, dynamic> toMap() {
     return {
@@ -30,6 +39,9 @@ class Pet {
       "image": image,
       "reminders": reminders,
       "weightHistory": weightHistory,
+      "vaccines": vaccines,
+      "dewormings": dewormings,
+      "diseases": diseases,
     };
   }
 
@@ -52,6 +64,18 @@ class Pet {
               ?.map((e) => double.tryParse(e.toString()) ?? 0.0)
               .toList() ??
           [],
+      vaccines:
+          (map['vaccines'] as List?)
+              ?.map((item) => Map<String, dynamic>.from(item as Map))
+              .toList() ??
+          [],
+      dewormings:
+          (map['dewormings'] as List?)
+              ?.map((item) => Map<String, dynamic>.from(item as Map))
+              .toList() ??
+          [],
+      diseases:
+          (map['diseases'] as List?)?.map((e) => e.toString()).toList() ?? [],
     );
   }
 }
