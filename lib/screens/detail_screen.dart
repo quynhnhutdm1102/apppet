@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import '../models/pet.dart';
 import 'dart:io';
 import 'package:intl/intl.dart';
-import 'package:fl_chart/fl_chart.dart';
 import '../services/notification_service.dart';
+import 'health_screen.dart';
 
 class DetailScreen extends StatefulWidget {
   final Pet pet;
@@ -29,49 +29,7 @@ class _DetailScreenState extends State<DetailScreen> {
     {"name": "Bác sĩ", "icon": Icons.local_hospital, "color": Colors.green},
   ];
 
-  // --- HÀM MỚI: HIỂN THỊ CỬA SỔ NHẬP CÂN NẶNG ---
-  void _showUpdateWeightDialog() {
-    final weightController = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text("Cập nhật cân nặng"),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        content: TextField(
-          controller: weightController,
-          keyboardType: TextInputType.numberWithOptions(decimal: true),
-          decoration: InputDecoration(
-            suffixText: "kg",
-            hintText: "Nhập cân nặng mới",
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text("Hủy"),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.teal),
-            onPressed: () {
-              if (weightController.text.isNotEmpty) {
-                double? newWeight = double.tryParse(weightController.text);
-                if (newWeight != null) {
-                  setState(() {
-                    widget.pet.weight = newWeight;
-                    widget.pet.weightHistory.add(newWeight);
-                  });
-                  widget.onUpdate(widget.pet); // Lưu vào Hive
-                }
-                Navigator.pop(context);
-              }
-            },
-            child: Text("Cập nhật", style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      ),
-    );
-  }
+  // Cập nhật cân nặng được chuyển vào HealthScreen
 
   @override
   Widget build(BuildContext context) {
@@ -100,58 +58,35 @@ class _DetailScreenState extends State<DetailScreen> {
             ),
             SizedBox(height: 20),
 
-            // 2. Biểu đồ cân nặng + NÚT CẬP NHẬT
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Theo dõi cân nặng (kg)",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                // NÚT BẤM CẬP NHẬT Ở ĐÂY
-                IconButton(
-                  icon: Icon(Icons.add_chart, color: Colors.teal, size: 28),
-                  onPressed: _showUpdateWeightDialog,
-                ),
-              ],
-            ),
-            SizedBox(height: 10),
-            Container(
-              height: 180,
-              padding: EdgeInsets.only(right: 20, top: 15, bottom: 10),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
+            // 2. Hồ sơ sức khỏe & Theo dõi cân nặng
+            Card(
+              elevation: 2,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+              child: ListTile(
+                leading: Container(
+                  padding: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.teal.withOpacity(0.1),
+                    shape: BoxShape.circle,
                   ),
-                ],
-              ),
-              child: LineChart(
-                LineChartData(
-                  gridData: FlGridData(show: false),
-                  titlesData: FlTitlesData(show: false),
-                  borderData: FlBorderData(show: false),
-                  lineBarsData: [
-                    LineChartBarData(
-                      spots: widget.pet.weightHistory
-                          .asMap()
-                          .entries
-                          .map((e) => FlSpot(e.key.toDouble(), e.value))
-                          .toList(),
-                      isCurved: true,
-                      color: Colors.teal,
-                      barWidth: 4,
-                      dotData: FlDotData(show: true),
-                      belowBarData: BarAreaData(
-                        show: true,
-                        color: Colors.teal.withOpacity(0.1),
+                  child: Icon(Icons.favorite, color: Colors.teal),
+                ),
+                title: Text("Hồ sơ sức khỏe", style: TextStyle(fontWeight: FontWeight.bold)),
+                subtitle: Text("Cân nặng, Tiêm phòng, Tẩy giun..."),
+                trailing: Icon(Icons.arrow_forward_ios, size: 16),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => HealthScreen(
+                        pet: widget.pet,
+                        onUpdate: widget.onUpdate,
                       ),
                     ),
-                  ],
-                ),
+                  ).then((_) {
+                    setState(() {}); // Refresh detail screen if health screen changed weight
+                  });
+                },
               ),
             ),
 
