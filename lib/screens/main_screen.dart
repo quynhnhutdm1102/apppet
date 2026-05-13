@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'home_screen.dart';
 import 'expense_screen.dart';
 import 'moment_screen.dart';
-import 'blog_screen.dart';
+import 'map_screen.dart';
 
 class MainScreen extends StatefulWidget {
   @override
@@ -17,7 +17,7 @@ class _MainScreenState extends State<MainScreen> {
     HomeScreen(),
     ExpenseScreen(),
     MomentScreen(),
-    BlogScreen(),
+    MapScreen(),
   ];
 
   @override
@@ -52,7 +52,7 @@ class _MainScreenState extends State<MainScreen> {
             label: 'Nhật ký',
           ),
 
-          BottomNavigationBarItem(icon: Icon(Icons.feed), label: 'Tin tức'),
+          BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Bản đồ'),
         ],
       ),
     );
