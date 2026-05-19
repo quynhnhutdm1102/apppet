@@ -21,11 +21,13 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void loadPets() {
-    // Lấy dữ liệu thô từ Hive
     final rawData = HiveService.box.values.toList();
+
     setState(() {
-      // Dùng Pet.fromMap(e as Map) để Hive tự xử lý kiểu dữ liệu
-      pets = rawData.map((e) => Pet.fromMap(e as Map)).toList();
+      pets = rawData
+          .map((e) => Pet.fromMap(e as Map))
+          .where((pet) => pet.userEmail == HiveService.currentUser)
+          .toList();
     });
   }
 

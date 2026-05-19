@@ -13,6 +13,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final emailController = TextEditingController();
+
   final passwordController = TextEditingController();
 
   final formKey = GlobalKey<FormState>();
@@ -21,25 +22,42 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void login() {
     if (formKey.currentState!.validate()) {
+      final users = HiveService.userBox;
+
       final email = emailController.text.trim();
+
       final password = passwordController.text.trim();
 
-      final user = HiveService.userBox.get(email);
+      final user = users.get(email);
 
-      // CHECK USER
-      if (user != null && user["password"] == password) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => MainScreen()),
-        );
-      } else {
+      if (user == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text("Sai email hoặc mật khẩu"),
+            content: Text("Tài khoản không tồn tại"),
             backgroundColor: Colors.red,
           ),
         );
+
+        return;
       }
+
+      if (user['password'] != password) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Sai mật khẩu"),
+            backgroundColor: Colors.red,
+          ),
+        );
+
+        return;
+      }
+
+      HiveService.currentUser = email;
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => MainScreen()),
+      );
     }
   }
 
@@ -73,7 +91,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     const SizedBox(height: 40),
 
-                    // EMAIL
                     TextFormField(
                       controller: emailController,
 
@@ -101,7 +118,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     const SizedBox(height: 20),
 
-                    // PASSWORD
                     TextFormField(
                       controller: passwordController,
                       obscureText: obscure,

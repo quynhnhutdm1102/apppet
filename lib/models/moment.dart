@@ -5,12 +5,16 @@ class Moment {
   DateTime date;
   String? petId;
 
+  // THÊM
+  String userEmail;
+
   Moment({
     required this.id,
     required this.imagePath,
     required this.caption,
     required this.date,
     this.petId,
+    required this.userEmail,
   });
 
   Map<String, dynamic> toMap() {
@@ -20,6 +24,7 @@ class Moment {
       "caption": caption,
       "date": date.toIso8601String(),
       "petId": petId,
+      "userEmail": userEmail,
     };
   }
 
@@ -32,6 +37,9 @@ class Moment {
           ? DateTime.parse(map['date'].toString())
           : DateTime.now(),
       petId: map['petId']?.toString(),
+
+      // THÊM
+      userEmail: map['userEmail']?.toString() ?? '',
     );
   }
 }

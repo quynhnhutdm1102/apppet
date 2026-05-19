@@ -19,9 +19,13 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
 
   void loadExpenses() {
     final rawData = HiveService.expenseBox.values.toList();
+
     setState(() {
-      expenses = rawData.map((e) => Expense.fromMap(e as Map)).toList();
-      // Sort by date descending
+      expenses = rawData
+          .map((e) => Expense.fromMap(Map<String, dynamic>.from(e)))
+          .where((e) => e.userEmail == HiveService.currentUser)
+          .toList();
+
       expenses.sort((a, b) => b.date.compareTo(a.date));
     });
   }
@@ -116,6 +120,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                       amount: double.tryParse(amountController.text) ?? 0,
                       category: selectedCategory,
                       date: DateTime.now(),
+                      userEmail: HiveService.currentUser ?? "",
                     );
 
                     HiveService.expenseBox.put(

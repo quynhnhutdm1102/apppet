@@ -5,6 +5,7 @@ import 'expense_screen.dart';
 import 'moment_screen.dart';
 import 'map_screen.dart';
 import 'login_screen.dart';
+import '../services/hive_service.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -30,16 +31,12 @@ class _MainScreenState extends State<MainScreen> {
   void logout() {
     showDialog(
       context: context,
-
       builder: (_) => AlertDialog(
         title: const Text("Đăng xuất"),
-
         content: const Text("Bạn có chắc muốn đăng xuất không?"),
-
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-
             child: const Text("Hủy"),
           ),
 
@@ -47,11 +44,12 @@ class _MainScreenState extends State<MainScreen> {
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
 
             onPressed: () {
+              // XÓA USER HIỆN TẠI
+              HiveService.currentUser = "";
+
               Navigator.pushAndRemoveUntil(
                 context,
-
                 MaterialPageRoute(builder: (_) => const LoginScreen()),
-
                 (route) => false,
               );
             },

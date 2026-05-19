@@ -3,6 +3,7 @@ import '../models/pet.dart';
 import 'dart:math';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import '../services/hive_service.dart';
 
 class AddPetScreen extends StatefulWidget {
   @override
@@ -41,6 +42,7 @@ class _AddPetScreenState extends State<AddPetScreen> {
       age: int.parse(age.text),
       weight: double.parse(weight.text),
       image: image!.path,
+      userEmail: HiveService.currentUser!,
     );
 
     Navigator.pop(context, pet);

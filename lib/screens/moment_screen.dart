@@ -1,9 +1,7 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-
 import '../models/moment.dart';
 import '../services/hive_service.dart';
 
@@ -33,6 +31,7 @@ class _MomentScreenState extends State<MomentScreen> {
     setState(() {
       moments = rawData
           .map((e) => Moment.fromMap(Map<String, dynamic>.from(e)))
+          .where((e) => e.userEmail == HiveService.currentUser)
           .toList();
 
       moments.sort((a, b) => b.date.compareTo(a.date));
@@ -118,12 +117,10 @@ class _MomentScreenState extends State<MomentScreen> {
                 onPressed: () async {
                   final newMoment = Moment(
                     id: DateTime.now().millisecondsSinceEpoch.toString(),
-
                     imagePath: pickedFile.path,
-
                     caption: captionController.text.trim(),
-
                     date: DateTime.now(),
+                    userEmail: HiveService.currentUser ?? "",
                   );
 
                   await HiveService.momentBox.put(

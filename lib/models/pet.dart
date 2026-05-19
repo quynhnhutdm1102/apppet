@@ -5,6 +5,7 @@ class Pet {
   int age;
   double weight;
   String image;
+  String userEmail;
   List<Map<String, dynamic>> reminders;
   List<double> weightHistory;
   List<Map<String, dynamic>> vaccines;
@@ -18,6 +19,7 @@ class Pet {
     required this.age,
     required this.weight,
     required this.image,
+    required this.userEmail,
     List<Map<String, dynamic>>? reminders,
     List<double>? weightHistory,
     List<Map<String, dynamic>>? vaccines,
@@ -37,6 +39,7 @@ class Pet {
       "age": age,
       "weight": weight,
       "image": image,
+      "userEmail": userEmail,
       "reminders": reminders,
       "weightHistory": weightHistory,
       "vaccines": vaccines,
@@ -53,6 +56,7 @@ class Pet {
       age: int.tryParse(map['age']?.toString() ?? '0') ?? 0,
       weight: double.tryParse(map['weight']?.toString() ?? '0.0') ?? 0.0,
       image: map['image']?.toString() ?? '',
+      userEmail: map['userEmail']?.toString() ?? '',
       // Fix lỗi chuyển đổi Map từ Hive ở đây
       reminders:
           (map['reminders'] as List?)

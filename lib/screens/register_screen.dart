@@ -11,21 +11,24 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final nameController = TextEditingController();
+
   final emailController = TextEditingController();
+
   final passwordController = TextEditingController();
 
   final formKey = GlobalKey<FormState>();
 
   bool obscure = true;
 
-  void register() async {
+  void register() {
     if (formKey.currentState!.validate()) {
+      final users = HiveService.userBox;
+
       final email = emailController.text.trim();
 
-      // CHECK EMAIL ĐÃ TỒN TẠI
-      final existingUser = HiveService.userBox.get(email);
+      final existed = users.containsKey(email);
 
-      if (existingUser != null) {
+      if (existed) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("Email đã tồn tại"),
@@ -36,8 +39,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         return;
       }
 
-      // LƯU USER
-      await HiveService.userBox.put(email, {
+      users.put(email, {
         "name": nameController.text.trim(),
         "email": email,
         "password": passwordController.text.trim(),
@@ -74,7 +76,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               children: [
                 const SizedBox(height: 20),
 
-                const Icon(Icons.pets, size: 80, color: Colors.teal),
+                Icon(Icons.pets, size: 80, color: Colors.teal),
 
                 const SizedBox(height: 15),
 
@@ -89,7 +91,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                 const SizedBox(height: 30),
 
-                // HỌ TÊN
                 TextFormField(
                   controller: nameController,
 
@@ -108,20 +109,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       return "Vui lòng nhập họ tên";
                     }
 
-                    if (value.trim().length < 2) {
-                      return "Họ tên quá ngắn";
-                    }
-
                     return null;
                   },
                 ),
 
                 const SizedBox(height: 20),
 
-                // EMAIL
                 TextFormField(
                   controller: emailController,
-                  keyboardType: TextInputType.emailAddress,
 
                   decoration: InputDecoration(
                     labelText: "Email",
@@ -138,7 +133,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       return "Vui lòng nhập email";
                     }
 
-                    if (!value.contains("@") || !value.contains(".")) {
+                    if (!value.contains("@")) {
                       return "Email không hợp lệ";
                     }
 
@@ -148,7 +143,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                 const SizedBox(height: 20),
 
-                // PASSWORD
                 TextFormField(
                   controller: passwordController,
                   obscureText: obscure,
@@ -190,7 +184,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                 const SizedBox(height: 35),
 
-                // BUTTON
                 SizedBox(
                   width: double.infinity,
 
@@ -217,8 +210,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                   ),
                 ),
-
-                const SizedBox(height: 20),
               ],
             ),
           ),

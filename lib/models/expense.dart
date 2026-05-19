@@ -2,9 +2,12 @@ class Expense {
   String id;
   String title;
   double amount;
-  String category; // Food, Medical, Toy, Other
+  String category;
   DateTime date;
   String? petId;
+
+  // THÊM
+  String userEmail;
 
   Expense({
     required this.id,
@@ -13,6 +16,7 @@ class Expense {
     required this.category,
     required this.date,
     this.petId,
+    required this.userEmail,
   });
 
   Map<String, dynamic> toMap() {
@@ -23,6 +27,7 @@ class Expense {
       "category": category,
       "date": date.toIso8601String(),
       "petId": petId,
+      "userEmail": userEmail,
     };
   }
 
@@ -36,6 +41,9 @@ class Expense {
           ? DateTime.parse(map['date'].toString())
           : DateTime.now(),
       petId: map['petId']?.toString(),
+
+      // THÊM
+      userEmail: map['userEmail']?.toString() ?? '',
     );
   }
 }
