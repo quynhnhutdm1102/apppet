@@ -4,10 +4,13 @@ import 'home_screen.dart';
 import 'expense_screen.dart';
 import 'moment_screen.dart';
 import 'map_screen.dart';
+import 'login_screen.dart';
 
 class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
+
   @override
-  _MainScreenState createState() => _MainScreenState();
+  State<MainScreen> createState() => _MainScreenState();
 }
 
 class _MainScreenState extends State<MainScreen> {
@@ -20,9 +23,66 @@ class _MainScreenState extends State<MainScreen> {
     MapScreen(),
   ];
 
+  // =========================
+  // ĐĂNG XUẤT
+  // =========================
+
+  void logout() {
+    showDialog(
+      context: context,
+
+      builder: (_) => AlertDialog(
+        title: const Text("Đăng xuất"),
+
+        content: const Text("Bạn có chắc muốn đăng xuất không?"),
+
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+
+            child: const Text("Hủy"),
+          ),
+
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+
+            onPressed: () {
+              Navigator.pushAndRemoveUntil(
+                context,
+
+                MaterialPageRoute(builder: (_) => const LoginScreen()),
+
+                (route) => false,
+              );
+            },
+
+            child: const Text(
+              "Đăng xuất",
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // =========================
+  // UI
+  // =========================
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text("PET MANAGER"),
+
+        backgroundColor: Colors.teal,
+
+        actions: [
+          IconButton(onPressed: logout, icon: const Icon(Icons.logout)),
+        ],
+      ),
+
       body: _pages[_currentIndex],
 
       bottomNavigationBar: BottomNavigationBar(

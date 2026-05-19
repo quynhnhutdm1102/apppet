@@ -46,45 +46,58 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
           builder: (context, setState) {
             return AlertDialog(
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20)),
+                borderRadius: BorderRadius.circular(20),
+              ),
               title: Text("Thêm chi tiêu"),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: titleController,
-                    decoration: InputDecoration(
-                      labelText: "Nội dung",
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10)),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: titleController,
+                      decoration: InputDecoration(
+                        labelText: "Nội dung",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 15),
-                  TextField(
-                    controller: amountController,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      labelText: "Số tiền (VNĐ)",
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10)),
+
+                    SizedBox(height: 15),
+
+                    TextField(
+                      controller: amountController,
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        labelText: "Số tiền (VNĐ)",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 15),
-                  DropdownButtonFormField<String>(
-                    value: selectedCategory,
-                    decoration: InputDecoration(
-                      labelText: "Phân loại",
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10)),
+
+                    SizedBox(height: 15),
+
+                    DropdownButtonFormField<String>(
+                      value: selectedCategory,
+
+                      decoration: InputDecoration(
+                        labelText: "Phân loại",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+
+                      items: categories.map((cat) {
+                        return DropdownMenuItem(value: cat, child: Text(cat));
+                      }).toList(),
+
+                      onChanged: (val) {
+                        setState(() => selectedCategory = val!);
+                      },
                     ),
-                    items: categories.map((cat) {
-                      return DropdownMenuItem(value: cat, child: Text(cat));
-                    }).toList(),
-                    onChanged: (val) {
-                      setState(() => selectedCategory = val!);
-                    },
-                  ),
-                ],
+                  ],
+                ),
               ),
               actions: [
                 TextButton(
@@ -94,8 +107,9 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                 ElevatedButton(
                   onPressed: () {
                     if (titleController.text.isEmpty ||
-                        amountController.text.isEmpty) return;
-                    
+                        amountController.text.isEmpty)
+                      return;
+
                     final newExpense = Expense(
                       id: DateTime.now().millisecondsSinceEpoch.toString(),
                       title: titleController.text,
@@ -103,21 +117,25 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                       category: selectedCategory,
                       date: DateTime.now(),
                     );
-                    
-                    HiveService.expenseBox.put(newExpense.id, newExpense.toMap());
+
+                    HiveService.expenseBox.put(
+                      newExpense.id,
+                      newExpense.toMap(),
+                    );
                     Navigator.pop(context);
                     loadExpenses();
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.teal,
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                   child: Text("Lưu", style: TextStyle(color: Colors.white)),
                 ),
               ],
             );
-          }
+          },
         );
       },
     );
@@ -125,19 +143,27 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
 
   IconData _getCategoryIcon(String category) {
     switch (category) {
-      case 'Thức ăn': return Icons.restaurant;
-      case 'Y tế': return Icons.local_hospital;
-      case 'Đồ chơi': return Icons.toys;
-      default: return Icons.category;
+      case 'Thức ăn':
+        return Icons.restaurant;
+      case 'Y tế':
+        return Icons.local_hospital;
+      case 'Đồ chơi':
+        return Icons.toys;
+      default:
+        return Icons.category;
     }
   }
 
   Color _getCategoryColor(String category) {
     switch (category) {
-      case 'Thức ăn': return Colors.orange;
-      case 'Y tế': return Colors.redAccent;
-      case 'Đồ chơi': return Colors.purpleAccent;
-      default: return Colors.grey;
+      case 'Thức ăn':
+        return Colors.orange;
+      case 'Y tế':
+        return Colors.redAccent;
+      case 'Đồ chơi':
+        return Colors.purpleAccent;
+      default:
+        return Colors.grey;
     }
   }
 
@@ -163,7 +189,11 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
               ),
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
-                BoxShadow(color: Colors.teal.withOpacity(0.3), blurRadius: 10, offset: Offset(0, 5))
+                BoxShadow(
+                  color: Colors.teal.withOpacity(0.3),
+                  blurRadius: 10,
+                  offset: Offset(0, 5),
+                ),
               ],
             ),
             child: Row(
@@ -172,61 +202,104 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Tổng chi tháng này", style: TextStyle(color: Colors.white70, fontSize: 16)),
+                    Text(
+                      "Tổng chi tháng này",
+                      style: TextStyle(color: Colors.white70, fontSize: 16),
+                    ),
                     SizedBox(height: 5),
                     Text(
                       formatCurrency.format(currentMonthTotal),
-                      style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ],
                 ),
-                Icon(Icons.account_balance_wallet, color: Colors.white, size: 50),
+                Icon(
+                  Icons.account_balance_wallet,
+                  color: Colors.white,
+                  size: 50,
+                ),
               ],
             ),
           ),
           Expanded(
             child: expenses.isEmpty
                 ? Center(
-                    child: Text("Chưa có khoản chi nào", style: TextStyle(color: Colors.grey)),
+                    child: Text(
+                      "Chưa có khoản chi nào",
+                      style: TextStyle(color: Colors.grey),
+                    ),
                   )
                 : ListView.builder(
                     itemCount: expenses.length,
                     itemBuilder: (context, index) {
                       final exp = expenses[index];
                       return Card(
-                        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                        margin: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
                         elevation: 2,
                         child: ListTile(
                           leading: CircleAvatar(
-                            backgroundColor: _getCategoryColor(exp.category).withOpacity(0.2),
-                            child: Icon(_getCategoryIcon(exp.category), color: _getCategoryColor(exp.category)),
+                            backgroundColor: _getCategoryColor(
+                              exp.category,
+                            ).withOpacity(0.2),
+                            child: Icon(
+                              _getCategoryIcon(exp.category),
+                              color: _getCategoryColor(exp.category),
+                            ),
                           ),
-                          title: Text(exp.title, style: TextStyle(fontWeight: FontWeight.bold)),
-                          subtitle: Text(DateFormat('dd/MM/yyyy HH:mm').format(exp.date)),
+                          title: Text(
+                            exp.title,
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: Text(
+                            DateFormat('dd/MM/yyyy HH:mm').format(exp.date),
+                          ),
                           trailing: Text(
                             "-${formatCurrency.format(exp.amount)}",
-                            style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 16),
+                            style: TextStyle(
+                              color: Colors.red,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
                           ),
                           onLongPress: () {
                             showDialog(
                               context: context,
                               builder: (_) => AlertDialog(
                                 title: Text("Xóa khoản chi?"),
-                                content: Text("Bạn có chắc muốn xóa khoản chi này?"),
+                                content: Text(
+                                  "Bạn có chắc muốn xóa khoản chi này?",
+                                ),
                                 actions: [
-                                  TextButton(onPressed: () => Navigator.pop(context), child: Text("Hủy")),
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: Text("Hủy"),
+                                  ),
                                   ElevatedButton(
                                     onPressed: () {
                                       HiveService.expenseBox.delete(exp.id);
                                       Navigator.pop(context);
                                       loadExpenses();
                                     },
-                                    style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                                    child: Text("Xóa", style: TextStyle(color: Colors.white)),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.red,
+                                    ),
+                                    child: Text(
+                                      "Xóa",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
                                   ),
                                 ],
-                              )
+                              ),
                             );
                           },
                         ),

@@ -63,9 +63,8 @@ class _HealthScreenState extends State<HealthScreen> {
           ),
 
           ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color.fromARGB(255, 244, 209, 245),
-            ),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.deepPurple),
+
             onPressed: () {
               final value = double.tryParse(controller.text);
 
@@ -78,6 +77,7 @@ class _HealthScreenState extends State<HealthScreen> {
                 Navigator.pop(context);
               }
             },
+
             child: const Text("Lưu", style: TextStyle(color: Colors.white)),
           ),
         ],
@@ -116,7 +116,8 @@ class _HealthScreenState extends State<HealthScreen> {
           ),
 
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.teal),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.deepPurple),
+
             onPressed: () {
               if (controller.text.isNotEmpty) {
                 final record = {
@@ -135,6 +136,7 @@ class _HealthScreenState extends State<HealthScreen> {
                 Navigator.pop(context);
               }
             },
+
             child: const Text("Lưu", style: TextStyle(color: Colors.white)),
           ),
         ],
@@ -160,15 +162,17 @@ class _HealthScreenState extends State<HealthScreen> {
     }).toList();
 
     return Container(
-      height: 280,
-      padding: const EdgeInsets.all(16),
+      height: 250,
+
+      padding: const EdgeInsets.only(left: 12, right: 20, top: 20, bottom: 10),
 
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(25),
+
         boxShadow: [
           BoxShadow(
-            color: Colors.black12,
+            color: Colors.black.withOpacity(0.06),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -187,7 +191,7 @@ class _HealthScreenState extends State<HealthScreen> {
 
           borderData: FlBorderData(
             show: true,
-            border: Border.all(color: Colors.teal.shade100),
+            border: Border.all(color: Colors.deepPurple.shade100),
           ),
 
           titlesData: FlTitlesData(
@@ -195,63 +199,40 @@ class _HealthScreenState extends State<HealthScreen> {
 
             rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
 
+            // ===== TRỤC Y =====
             leftTitles: AxisTitles(
-              axisNameWidget: const Padding(
-                padding: EdgeInsets.only(bottom: 8),
-                child: Text(
-                  "Kg",
-                  style: TextStyle(
-                    color: Colors.teal,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-
               sideTitles: SideTitles(
                 showTitles: true,
-                reservedSize: 40,
+                reservedSize: 30,
                 interval: 1,
 
                 getTitlesWidget: (value, meta) {
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: Text(
-                      value.toStringAsFixed(0),
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
+                  return Text(
+                    value.toInt().toString(),
+
+                    style: TextStyle(fontSize: 11, color: Colors.grey.shade700),
                   );
                 },
               ),
             ),
 
+            // ===== TRỤC X =====
             bottomTitles: AxisTitles(
-              axisNameWidget: const Padding(
-                padding: EdgeInsets.only(top: 10),
-                child: Text(
-                  "Lần cập nhật",
-                  style: TextStyle(
-                    color: Colors.teal,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-
               sideTitles: SideTitles(
                 showTitles: true,
-                reservedSize: 34,
+                reservedSize: 28,
                 interval: 1,
 
                 getTitlesWidget: (value, meta) {
                   return Padding(
                     padding: const EdgeInsets.only(top: 6),
+
                     child: Text(
                       "#${value.toInt() + 1}",
+
                       style: TextStyle(
                         fontSize: 11,
-                        color: Colors.grey.shade600,
+                        color: Colors.grey.shade700,
                       ),
                     ),
                   );
@@ -263,16 +244,20 @@ class _HealthScreenState extends State<HealthScreen> {
           lineBarsData: [
             LineChartBarData(
               spots: spots,
+
               isCurved: true,
-              color: Colors.teal,
+
+              color: Colors.deepPurple,
+
               barWidth: 4,
+
               isStrokeCapRound: true,
 
               dotData: FlDotData(show: true),
 
               belowBarData: BarAreaData(
                 show: true,
-                color: Colors.teal.withOpacity(0.15),
+                color: Colors.deepPurple.withOpacity(0.15),
               ),
             ),
           ],
@@ -306,9 +291,11 @@ class _HealthScreenState extends State<HealthScreen> {
           // HEADER
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
             children: [
               Text(
                 title,
+
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -320,7 +307,7 @@ class _HealthScreenState extends State<HealthScreen> {
 
                 icon: const Icon(
                   Icons.add_circle,
-                  color: Colors.teal,
+                  color: Colors.deepPurple,
                   size: 30,
                 ),
               ),
@@ -343,7 +330,7 @@ class _HealthScreenState extends State<HealthScreen> {
               padding: const EdgeInsets.all(10),
 
               decoration: BoxDecoration(
-                color: Colors.teal.withOpacity(0.06),
+                color: Colors.deepPurple.withOpacity(0.06),
                 borderRadius: BorderRadius.circular(15),
               ),
 
@@ -351,10 +338,11 @@ class _HealthScreenState extends State<HealthScreen> {
                 contentPadding: EdgeInsets.zero,
 
                 leading: CircleAvatar(
-                  backgroundColor: Colors.teal,
+                  backgroundColor: Colors.deepPurple,
 
                   child: Icon(
                     type == 'vaccine' ? Icons.vaccines : Icons.medication,
+
                     color: Colors.white,
                   ),
                 ),
@@ -396,7 +384,7 @@ class _HealthScreenState extends State<HealthScreen> {
       appBar: AppBar(title: const Text("Hồ sơ sức khỏe"), centerTitle: true),
 
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.teal,
+        backgroundColor: Colors.deepPurple,
         onPressed: _addWeightRecord,
         child: const Icon(Icons.add),
       ),
@@ -406,9 +394,11 @@ class _HealthScreenState extends State<HealthScreen> {
 
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+
           children: [
             const Text(
               "Biểu đồ cân nặng",
+
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
 
@@ -416,6 +406,7 @@ class _HealthScreenState extends State<HealthScreen> {
 
             Text(
               "Theo dõi sự phát triển của thú cưng",
+
               style: TextStyle(color: Colors.grey.shade600),
             ),
 
