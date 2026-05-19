@@ -10,14 +10,15 @@ class DetailScreen extends StatefulWidget {
   final Function(String) onDelete;
   final Function(Pet) onUpdate;
 
-  DetailScreen({
+  const DetailScreen({
+    super.key,
     required this.pet,
     required this.onDelete,
     required this.onUpdate,
   });
 
   @override
-  _DetailScreenState createState() => _DetailScreenState();
+  State<DetailScreen> createState() => _DetailScreenState();
 }
 
 class _DetailScreenState extends State<DetailScreen> {
@@ -33,7 +34,7 @@ class _DetailScreenState extends State<DetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF8F9FA),
+      backgroundColor: const Color(0xFFF8F9FA),
 
       appBar: AppBar(
         title: Text(widget.pet.name),
@@ -41,13 +42,15 @@ class _DetailScreenState extends State<DetailScreen> {
       ),
 
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
 
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
 
           children: [
+            // =========================
             // IMAGE
+            // =========================
             Center(
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(30),
@@ -61,62 +64,138 @@ class _DetailScreenState extends State<DetailScreen> {
               ),
             ),
 
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
-            // HEALTH
+            // =========================
+            // HEALTH CARD
+            // =========================
             Card(
-              elevation: 2,
+              elevation: 3,
 
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
+                borderRadius: BorderRadius.circular(18),
               ),
 
-              child: ListTile(
-                leading: Container(
-                  padding: EdgeInsets.all(10),
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: Container(
+                      padding: const EdgeInsets.all(10),
 
-                  decoration: BoxDecoration(
-                    color: Colors.teal.withOpacity(0.1),
-                    shape: BoxShape.circle,
+                      decoration: BoxDecoration(
+                        color: Colors.teal.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+
+                      child: const Icon(Icons.favorite, color: Colors.teal),
+                    ),
+
+                    title: const Text(
+                      "Hồ sơ sức khỏe",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+
+                    subtitle: const Text("Cân nặng, Tiêm phòng, Tẩy giun..."),
+
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+
+                    onTap: () {
+                      Navigator.push(
+                        context,
+
+                        MaterialPageRoute(
+                          builder: (_) => HealthScreen(
+                            pet: widget.pet,
+                            onUpdate: widget.onUpdate,
+                          ),
+                        ),
+                      ).then((_) {
+                        setState(() {});
+                      });
+                    },
                   ),
 
-                  child: Icon(Icons.favorite, color: Colors.teal),
-                ),
+                  // =========================
+                  // GIẢI THÍCH BIỂU ĐỒ
+                  // =========================
+                  Container(
+                    width: double.infinity,
 
-                title: Text(
-                  "Hồ sơ sức khỏe",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-
-                subtitle: Text("Cân nặng, Tiêm phòng, Tẩy giun..."),
-
-                trailing: Icon(Icons.arrow_forward_ios, size: 16),
-
-                onTap: () {
-                  Navigator.push(
-                    context,
-
-                    MaterialPageRoute(
-                      builder: (_) => HealthScreen(
-                        pet: widget.pet,
-                        onUpdate: widget.onUpdate,
-                      ),
+                    margin: const EdgeInsets.only(
+                      left: 16,
+                      right: 16,
+                      bottom: 16,
                     ),
-                  ).then((_) {
-                    setState(() {});
-                  });
-                },
+
+                    padding: const EdgeInsets.all(14),
+
+                    decoration: BoxDecoration(
+                      color: Colors.teal.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+
+                      children: [
+                        Row(
+                          children: const [
+                            Icon(
+                              Icons.info_outline,
+                              color: Colors.teal,
+                              size: 18,
+                            ),
+
+                            SizedBox(width: 6),
+
+                            Text(
+                              "Biểu đồ sức khỏe",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.teal,
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 10),
+
+                        _buildGuideItem(
+                          color: Colors.blue,
+                          text: "Đường màu xanh: Cân nặng theo thời gian",
+                        ),
+
+                        const SizedBox(height: 6),
+
+                        _buildGuideItem(
+                          color: Colors.orange,
+                          text: "Điểm càng cao → cân nặng càng lớn",
+                        ),
+
+                        const SizedBox(height: 6),
+
+                        _buildGuideItem(
+                          color: Colors.green,
+                          text:
+                              "Theo dõi tăng/giảm cân để biết thú cưng có khỏe mạnh không",
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
 
-            SizedBox(height: 25),
+            const SizedBox(height: 25),
 
+            // =========================
             // TITLE
+            // =========================
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
               children: [
-                Text(
+                const Text(
                   "Lịch nhắc nhở",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
@@ -124,9 +203,9 @@ class _DetailScreenState extends State<DetailScreen> {
                 ElevatedButton.icon(
                   onPressed: _showAddReminderSheet,
 
-                  icon: Icon(Icons.add, size: 18),
+                  icon: const Icon(Icons.add, size: 18),
 
-                  label: Text("Thêm"),
+                  label: const Text("Thêm"),
 
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.teal,
@@ -136,13 +215,15 @@ class _DetailScreenState extends State<DetailScreen> {
               ],
             ),
 
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
 
+            // =========================
             // EMPTY
+            // =========================
             widget.pet.reminders.isEmpty
-                ? Center(
+                ? const Center(
                     child: Padding(
-                      padding: const EdgeInsets.all(20),
+                      padding: EdgeInsets.all(20),
 
                       child: Text(
                         "Chưa có lịch nhắc nào",
@@ -150,10 +231,12 @@ class _DetailScreenState extends State<DetailScreen> {
                       ),
                     ),
                   )
+                // =========================
                 // LIST
+                // =========================
                 : ListView.builder(
                     shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
+                    physics: const NeverScrollableScrollPhysics(),
 
                     itemCount: widget.pet.reminders.length,
 
@@ -168,7 +251,7 @@ class _DetailScreenState extends State<DetailScreen> {
                       final bool completed = item['completed'] ?? false;
 
                       return Card(
-                        margin: EdgeInsets.only(bottom: 12),
+                        margin: const EdgeInsets.only(bottom: 12),
 
                         elevation: 0,
 
@@ -196,7 +279,7 @@ class _DetailScreenState extends State<DetailScreen> {
                                 child: Icon(cat['icon'], color: cat['color']),
                               ),
 
-                              SizedBox(width: 12),
+                              const SizedBox(width: 12),
 
                               // CONTENT
                               Expanded(
@@ -207,22 +290,22 @@ class _DetailScreenState extends State<DetailScreen> {
                                     Text(
                                       item['category'],
 
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 18,
                                       ),
                                     ),
 
-                                    SizedBox(height: 5),
+                                    const SizedBox(height: 5),
 
                                     Text(
                                       "Nhắc lúc: ${DateFormat('dd/MM/yyyy - HH:mm').format(DateTime.parse(item['time']))}",
                                     ),
 
-                                    SizedBox(height: 8),
+                                    const SizedBox(height: 8),
 
                                     Container(
-                                      padding: EdgeInsets.symmetric(
+                                      padding: const EdgeInsets.symmetric(
                                         horizontal: 12,
                                         vertical: 5,
                                       ),
@@ -251,7 +334,6 @@ class _DetailScreenState extends State<DetailScreen> {
                                       ),
                                     ),
 
-                                    // HISTORY
                                     if (completed &&
                                         item['completedTime'] != null)
                                       Padding(
@@ -270,7 +352,7 @@ class _DetailScreenState extends State<DetailScreen> {
                                 ),
                               ),
 
-                              SizedBox(width: 8),
+                              const SizedBox(width: 8),
 
                               // ACTIONS
                               Column(
@@ -306,7 +388,7 @@ class _DetailScreenState extends State<DetailScreen> {
                                     ),
                                   ),
 
-                                  SizedBox(height: 12),
+                                  const SizedBox(height: 12),
 
                                   GestureDetector(
                                     onTap: () {
@@ -317,7 +399,7 @@ class _DetailScreenState extends State<DetailScreen> {
                                       widget.onUpdate(widget.pet);
                                     },
 
-                                    child: Icon(
+                                    child: const Icon(
                                       Icons.delete_sweep,
                                       color: Colors.redAccent,
                                       size: 28,
@@ -332,8 +414,11 @@ class _DetailScreenState extends State<DetailScreen> {
                     },
                   ),
 
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
 
+            // =========================
+            // DELETE PET
+            // =========================
             Center(
               child: TextButton.icon(
                 onPressed: () {
@@ -342,9 +427,9 @@ class _DetailScreenState extends State<DetailScreen> {
                   Navigator.pop(context);
                 },
 
-                icon: Icon(Icons.delete_forever, color: Colors.red),
+                icon: const Icon(Icons.delete_forever, color: Colors.red),
 
-                label: Text(
+                label: const Text(
                   "Xóa thú cưng",
 
                   style: TextStyle(
@@ -355,10 +440,31 @@ class _DetailScreenState extends State<DetailScreen> {
               ),
             ),
 
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
           ],
         ),
       ),
+    );
+  }
+
+  // =========================
+  // GUIDE ITEM
+  // =========================
+
+  Widget _buildGuideItem({required Color color, required String text}) {
+    return Row(
+      children: [
+        Container(
+          width: 12,
+          height: 12,
+
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
+
+        const SizedBox(width: 8),
+
+        Expanded(child: Text(text, style: const TextStyle(fontSize: 13))),
+      ],
     );
   }
 
@@ -370,25 +476,25 @@ class _DetailScreenState extends State<DetailScreen> {
     showModalBottomSheet(
       context: context,
 
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
       ),
 
       builder: (context) => StatefulBuilder(
         builder: (context, setModalState) => Container(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
 
           child: Column(
             mainAxisSize: MainAxisSize.min,
 
             children: [
-              Text(
+              const Text(
                 "Chọn loại hoạt động",
 
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
 
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
 
               Wrap(
                 spacing: 10,
@@ -412,11 +518,11 @@ class _DetailScreenState extends State<DetailScreen> {
                     .toList(),
               ),
 
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
 
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  minimumSize: Size(double.infinity, 50),
+                  minimumSize: const Size(double.infinity, 50),
 
                   backgroundColor: Colors.teal,
                   foregroundColor: Colors.white,
@@ -424,7 +530,7 @@ class _DetailScreenState extends State<DetailScreen> {
 
                 onPressed: () => _pickDateTime(),
 
-                child: Text("Chọn ngày & giờ"),
+                child: const Text("Chọn ngày & giờ"),
               ),
             ],
           ),

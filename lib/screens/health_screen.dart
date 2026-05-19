@@ -19,6 +19,8 @@ class HealthScreen extends StatefulWidget {
 class _HealthScreenState extends State<HealthScreen> {
   late Pet _pet;
 
+  final Color primaryColor = Colors.teal;
+
   @override
   void initState() {
     super.initState();
@@ -27,14 +29,15 @@ class _HealthScreenState extends State<HealthScreen> {
 
   void _savePet() {
     HiveService.box.put(_pet.id, _pet.toMap());
+
     widget.onUpdate(_pet);
 
     setState(() {});
   }
 
-  // =========================
+  // =====================================================
   // THÊM CÂN NẶNG
-  // =========================
+  // =====================================================
 
   void _addWeightRecord() {
     final controller = TextEditingController();
@@ -49,6 +52,7 @@ class _HealthScreenState extends State<HealthScreen> {
         content: TextField(
           controller: controller,
           keyboardType: TextInputType.number,
+
           decoration: const InputDecoration(
             hintText: "Nhập cân nặng",
             suffixText: "kg",
@@ -63,13 +67,14 @@ class _HealthScreenState extends State<HealthScreen> {
           ),
 
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.deepPurple),
+            style: ElevatedButton.styleFrom(backgroundColor: primaryColor),
 
             onPressed: () {
               final value = double.tryParse(controller.text);
 
               if (value != null && value > 0) {
                 _pet.weight = value;
+
                 _pet.weightHistory.add(value);
 
                 _savePet();
@@ -85,9 +90,9 @@ class _HealthScreenState extends State<HealthScreen> {
     );
   }
 
-  // =========================
-  // THÊM LỊCH SỬ Y TẾ
-  // =========================
+  // =====================================================
+  // THÊM HỒ SƠ Y TẾ
+  // =====================================================
 
   void _addMedicalRecord(String type) {
     final controller = TextEditingController();
@@ -103,8 +108,10 @@ class _HealthScreenState extends State<HealthScreen> {
 
         content: TextField(
           controller: controller,
+
           decoration: InputDecoration(
             hintText: type == 'vaccine' ? "Tên vaccine" : "Tên thuốc",
+
             border: const OutlineInputBorder(),
           ),
         ),
@@ -116,12 +123,12 @@ class _HealthScreenState extends State<HealthScreen> {
           ),
 
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.deepPurple),
+            style: ElevatedButton.styleFrom(backgroundColor: primaryColor),
 
             onPressed: () {
-              if (controller.text.isNotEmpty) {
+              if (controller.text.trim().isNotEmpty) {
                 final record = {
-                  "title": controller.text,
+                  "title": controller.text.trim(),
                   "date": DateTime.now().toIso8601String(),
                 };
 
@@ -144,15 +151,145 @@ class _HealthScreenState extends State<HealthScreen> {
     );
   }
 
-  // =========================
+  // =====================================================
+  // XÓA RECORD
+  // =====================================================
+
+  void _confirmDelete({
+    required List<Map<String, dynamic>> records,
+    required Map<String, dynamic> item,
+    required String title,
+  }) {
+    showDialog(
+      context: context,
+
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+
+        title: const Text("Xóa dữ liệu"),
+
+        content: Text("Bạn có chắc muốn xóa \"$title\" không?"),
+
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Hủy"),
+          ),
+
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+
+            onPressed: () {
+              records.remove(item);
+
+              _savePet();
+
+              Navigator.pop(context);
+            },
+
+            child: const Text("Xóa", style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // =====================================================
+  // GIẢI THÍCH BIỂU ĐỒ
+  // =====================================================
+
+  Widget _buildChartGuide() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+
+      decoration: BoxDecoration(
+        color: primaryColor.withOpacity(0.08),
+
+        borderRadius: BorderRadius.circular(18),
+      ),
+
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+
+        children: [
+          Row(
+            children: [
+              Icon(Icons.info_outline, color: primaryColor),
+
+              const SizedBox(width: 8),
+
+              const Text(
+                "Giải thích biểu đồ",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 12),
+
+          _guideItem("Trục ngang (#1, #2...)", "Là số lần cập nhật cân nặng"),
+
+          const SizedBox(height: 8),
+
+          _guideItem("Trục dọc", "Là cân nặng của thú cưng (kg)"),
+
+          const SizedBox(height: 8),
+
+          _guideItem("Đường biểu đồ tăng", "Thú cưng đang phát triển tốt"),
+
+          const SizedBox(height: 8),
+
+          _guideItem("Đường biểu đồ giảm", "Có thể thú cưng đang sụt cân"),
+        ],
+      ),
+    );
+  }
+
+  Widget _guideItem(String title, String desc) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+
+      children: [
+        Icon(Icons.circle, size: 8, color: primaryColor),
+
+        const SizedBox(width: 8),
+
+        Expanded(
+          child: RichText(
+            text: TextSpan(
+              style: TextStyle(color: Colors.grey.shade800, fontSize: 13),
+
+              children: [
+                TextSpan(
+                  text: "$title: ",
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+
+                TextSpan(text: desc),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // =====================================================
   // BIỂU ĐỒ
-  // =========================
+  // =====================================================
 
   Widget _buildWeightChart() {
     if (_pet.weightHistory.isEmpty) {
       return Container(
-        height: 240,
+        height: 250,
+
         alignment: Alignment.center,
+
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(25),
+        ),
+
         child: const Text("Chưa có dữ liệu cân nặng"),
       );
     }
@@ -162,17 +299,18 @@ class _HealthScreenState extends State<HealthScreen> {
     }).toList();
 
     return Container(
-      height: 250,
+      height: 320,
 
-      padding: const EdgeInsets.only(left: 12, right: 20, top: 20, bottom: 10),
+      padding: const EdgeInsets.fromLTRB(10, 25, 25, 20),
 
       decoration: BoxDecoration(
         color: Colors.white,
+
         borderRadius: BorderRadius.circular(25),
 
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withOpacity(0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -183,6 +321,8 @@ class _HealthScreenState extends State<HealthScreen> {
         LineChartData(
           minY: 0,
 
+          clipData: FlClipData.none(),
+
           gridData: FlGridData(
             show: true,
             drawVerticalLine: false,
@@ -191,7 +331,8 @@ class _HealthScreenState extends State<HealthScreen> {
 
           borderData: FlBorderData(
             show: true,
-            border: Border.all(color: Colors.deepPurple.shade100),
+
+            border: Border.all(color: primaryColor.withOpacity(0.2)),
           ),
 
           titlesData: FlTitlesData(
@@ -199,11 +340,26 @@ class _HealthScreenState extends State<HealthScreen> {
 
             rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
 
-            // ===== TRỤC Y =====
+            // Y
             leftTitles: AxisTitles(
+              axisNameWidget: Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+
+                child: Text(
+                  "KG",
+
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: primaryColor,
+                  ),
+                ),
+              ),
+
+              axisNameSize: 25,
+
               sideTitles: SideTitles(
                 showTitles: true,
-                reservedSize: 30,
+                reservedSize: 40,
                 interval: 1,
 
                 getTitlesWidget: (value, meta) {
@@ -216,11 +372,26 @@ class _HealthScreenState extends State<HealthScreen> {
               ),
             ),
 
-            // ===== TRỤC X =====
+            // X
             bottomTitles: AxisTitles(
+              axisNameWidget: Padding(
+                padding: const EdgeInsets.only(top: 12),
+
+                child: Text(
+                  "Số lần cập nhật",
+
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: primaryColor,
+                  ),
+                ),
+              ),
+
+              axisNameSize: 35,
+
               sideTitles: SideTitles(
                 showTitles: true,
-                reservedSize: 28,
+                reservedSize: 30,
                 interval: 1,
 
                 getTitlesWidget: (value, meta) {
@@ -247,7 +418,7 @@ class _HealthScreenState extends State<HealthScreen> {
 
               isCurved: true,
 
-              color: Colors.deepPurple,
+              color: primaryColor,
 
               barWidth: 4,
 
@@ -257,7 +428,8 @@ class _HealthScreenState extends State<HealthScreen> {
 
               belowBarData: BarAreaData(
                 show: true,
-                color: Colors.deepPurple.withOpacity(0.15),
+
+                color: primaryColor.withOpacity(0.15),
               ),
             ),
           ],
@@ -266,9 +438,153 @@ class _HealthScreenState extends State<HealthScreen> {
     );
   }
 
-  // =========================
-  // DANH SÁCH Y TẾ
-  // =========================
+  // =====================================================
+  // CARD RECORD VIP
+  // =====================================================
+
+  Widget _buildMedicalCard({
+    required Map<String, dynamic> item,
+    required String type,
+    required List<Map<String, dynamic>> records,
+  }) {
+    final date = DateFormat('dd/MM/yyyy').format(DateTime.parse(item['date']));
+
+    final bool isVaccine = type == 'vaccine';
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 14),
+
+      padding: const EdgeInsets.all(14),
+
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [primaryColor.withOpacity(0.12), Colors.white],
+
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+
+        borderRadius: BorderRadius.circular(22),
+
+        border: Border.all(color: primaryColor.withOpacity(0.15)),
+
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(14),
+
+            decoration: BoxDecoration(
+              color: isVaccine ? Colors.teal : Colors.orange,
+
+              borderRadius: BorderRadius.circular(18),
+            ),
+
+            child: Icon(
+              isVaccine ? Icons.vaccines : Icons.medication,
+
+              color: Colors.white,
+              size: 28,
+            ),
+          ),
+
+          const SizedBox(width: 14),
+
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+
+              children: [
+                Text(
+                  item['title'],
+
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+
+                const SizedBox(height: 6),
+
+                Row(
+                  children: [
+                    Icon(
+                      Icons.calendar_month,
+                      size: 16,
+                      color: Colors.grey.shade600,
+                    ),
+
+                    const SizedBox(width: 5),
+
+                    Text(
+                      date,
+
+                      style: TextStyle(
+                        color: Colors.grey.shade700,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 10),
+
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+
+                  decoration: BoxDecoration(
+                    color: isVaccine
+                        ? Colors.teal.withOpacity(0.12)
+                        : Colors.orange.withOpacity(0.12),
+
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+
+                  child: Text(
+                    isVaccine ? "Đã tiêm phòng" : "Đã tẩy giun",
+
+                    style: TextStyle(
+                      color: isVaccine ? Colors.teal : Colors.orange,
+
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          IconButton(
+            icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+
+            onPressed: () {
+              _confirmDelete(
+                records: records,
+                item: item,
+                title: item['title'],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  // =====================================================
+  // DANH SÁCH
+  // =====================================================
 
   Widget _buildRecordList(
     String title,
@@ -276,19 +592,24 @@ class _HealthScreenState extends State<HealthScreen> {
     String type,
   ) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 20),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 24),
+
+      padding: const EdgeInsets.all(18),
 
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10)],
+
+        borderRadius: BorderRadius.circular(25),
+
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10),
+        ],
       ),
 
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+
         children: [
-          // HEADER
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
@@ -305,87 +626,55 @@ class _HealthScreenState extends State<HealthScreen> {
               IconButton(
                 onPressed: () => _addMedicalRecord(type),
 
-                icon: const Icon(
-                  Icons.add_circle,
-                  color: Colors.deepPurple,
-                  size: 30,
-                ),
+                icon: Icon(Icons.add_circle, color: primaryColor, size: 30),
               ),
             ],
           ),
 
           const SizedBox(height: 10),
 
-          // EMPTY
           if (records.isEmpty)
-            Text(
-              "Chưa có dữ liệu",
-              style: TextStyle(color: Colors.grey.shade600),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 15),
+
+              child: Center(
+                child: Text(
+                  "Chưa có dữ liệu",
+                  style: TextStyle(color: Colors.grey.shade600),
+                ),
+              ),
             ),
 
-          // LIST
           ...records.map(
-            (r) => Container(
-              margin: const EdgeInsets.only(bottom: 12),
-              padding: const EdgeInsets.all(10),
-
-              decoration: BoxDecoration(
-                color: Colors.deepPurple.withOpacity(0.06),
-                borderRadius: BorderRadius.circular(15),
-              ),
-
-              child: ListTile(
-                contentPadding: EdgeInsets.zero,
-
-                leading: CircleAvatar(
-                  backgroundColor: Colors.deepPurple,
-
-                  child: Icon(
-                    type == 'vaccine' ? Icons.vaccines : Icons.medication,
-
-                    color: Colors.white,
-                  ),
-                ),
-
-                title: Text(
-                  r['title'],
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-
-                subtitle: Text(
-                  DateFormat('dd/MM/yyyy').format(DateTime.parse(r['date'])),
-                ),
-
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.redAccent),
-
-                  onPressed: () {
-                    records.remove(r);
-                    _savePet();
-                  },
-                ),
-              ),
-            ),
+            (r) => _buildMedicalCard(item: r, type: type, records: records),
           ),
         ],
       ),
     );
   }
 
-  // =========================
+  // =====================================================
   // UI
-  // =========================
+  // =====================================================
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
 
-      appBar: AppBar(title: const Text("Hồ sơ sức khỏe"), centerTitle: true),
+      appBar: AppBar(
+        title: const Text("Hồ sơ sức khỏe"),
+
+        centerTitle: true,
+
+        foregroundColor: Colors.teal,
+      ),
 
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: primaryColor,
+
         onPressed: _addWeightRecord,
+
         child: const Icon(Icons.add),
       ),
 
@@ -409,6 +698,10 @@ class _HealthScreenState extends State<HealthScreen> {
 
               style: TextStyle(color: Colors.grey.shade600),
             ),
+
+            const SizedBox(height: 20),
+
+            _buildChartGuide(),
 
             const SizedBox(height: 20),
 

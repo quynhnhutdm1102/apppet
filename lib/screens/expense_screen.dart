@@ -19,7 +19,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
     'Y tế',
     'Đồ chơi/Phụ kiện',
     'Spa/Làm đẹp',
-    'Khác'
+    'Khác',
   ];
 
   @override
@@ -59,121 +59,186 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
   void _showAddExpenseDialog() {
     final titleController = TextEditingController();
     final amountController = TextEditingController();
+
     String selectedCategory = categories.first;
-    String? selectedPetId; // null means "Dùng chung"
+    String selectedPetId = "common";
 
     showDialog(
       context: context,
+      barrierDismissible: true,
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setStateDialog) {
-            return AlertDialog(
+            return Dialog(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
-              title: Text("Thêm chi tiêu"),
-              content: SingleChildScrollView(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.only(
+                  left: 20,
+                  right: 20,
+                  top: 20,
+                  bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+                ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    Text(
+                      "Thêm chi tiêu",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+
+                    SizedBox(height: 20),
+
+                    // Nội dung
                     TextField(
                       controller: titleController,
                       decoration: InputDecoration(
                         labelText: "Nội dung",
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(12),
                         ),
                       ),
                     ),
+
                     SizedBox(height: 15),
+
+                    // Số tiền
                     TextField(
                       controller: amountController,
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
                         labelText: "Số tiền (VNĐ)",
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(12),
                         ),
                       ),
                     ),
+
                     SizedBox(height: 15),
+
+                    // Danh mục
                     DropdownButtonFormField<String>(
                       value: selectedCategory,
                       decoration: InputDecoration(
-                        labelText: "Phân loại",
+                        labelText: "Danh mục",
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(12),
                         ),
                       ),
                       items: categories.map((cat) {
                         return DropdownMenuItem(value: cat, child: Text(cat));
                       }).toList(),
-                      onChanged: (val) {
-                        setStateDialog(() => selectedCategory = val!);
+                      onChanged: (value) {
+                        setStateDialog(() {
+                          selectedCategory = value!;
+                        });
                       },
                     ),
+
                     SizedBox(height: 15),
-                    DropdownButtonFormField<String?>(
+
+                    // Thú cưng
+                    DropdownButtonFormField<String>(
                       value: selectedPetId,
                       decoration: InputDecoration(
                         labelText: "Gắn với thú cưng",
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(12),
                         ),
                       ),
                       items: [
-                        DropdownMenuItem<String?>(
-                          value: null,
-                          child: Text("Dùng chung (Không gắn riêng)"),
+                        DropdownMenuItem(
+                          value: "common",
+                          child: Text("Dùng chung"),
                         ),
+
                         ...pets.map((pet) {
-                          return DropdownMenuItem<String?>(
+                          return DropdownMenuItem(
                             value: pet.id,
                             child: Text(pet.name),
                           );
                         }).toList(),
                       ],
-                      onChanged: (val) {
-                        setStateDialog(() => selectedPetId = val);
+                      onChanged: (value) {
+                        setStateDialog(() {
+                          selectedPetId = value!;
+                        });
                       },
+                    ),
+
+                    SizedBox(height: 25),
+
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: Text("Hủy"),
+                          ),
+                        ),
+
+                        SizedBox(width: 10),
+
+                        Expanded(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.teal,
+                            ),
+                            onPressed: () {
+                              if (titleController.text.trim().isEmpty ||
+                                  amountController.text.trim().isEmpty) {
+                                return;
+                              }
+
+                              final newExpense = Expense(
+                                id: DateTime.now().millisecondsSinceEpoch
+                                    .toString(),
+
+                                title: titleController.text.trim(),
+
+                                amount:
+                                    double.tryParse(
+                                      amountController.text.trim(),
+                                    ) ??
+                                    0,
+
+                                category: selectedCategory,
+
+                                date: DateTime.now(),
+
+                                petId: selectedPetId == "common"
+                                    ? null
+                                    : selectedPetId,
+
+                                userEmail: HiveService.currentUser ?? "guest",
+                              );
+
+                              HiveService.expenseBox.put(
+                                newExpense.id,
+                                newExpense.toMap(),
+                              );
+
+                              Navigator.pop(context);
+
+                              loadExpenses();
+                            },
+                            child: Text(
+                              "Lưu",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text("Hủy", style: TextStyle(color: Colors.grey)),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    if (titleController.text.isEmpty ||
-                        amountController.text.isEmpty) return;
-
-                    final newExpense = Expense(
-                      id: DateTime.now().millisecondsSinceEpoch.toString(),
-                      title: titleController.text,
-                      amount: double.tryParse(amountController.text) ?? 0,
-                      category: selectedCategory,
-                      date: DateTime.now(),
-                    );
-
-                    HiveService.expenseBox.put(
-                      newExpense.id,
-                      newExpense.toMap(),
-                    );
-                    Navigator.pop(context);
-                    loadExpenses();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.teal,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  child: Text("Lưu", style: TextStyle(color: Colors.white)),
-                ),
-              ],
             );
           },
         );
@@ -273,7 +338,10 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
     );
   }
 
-  Widget _buildPieChart(Map<String, double> data, Color Function(String) colorGetter) {
+  Widget _buildPieChart(
+    Map<String, double> data,
+    Color Function(String) colorGetter,
+  ) {
     if (data.isEmpty) {
       return Padding(
         padding: const EdgeInsets.all(20.0),
@@ -286,14 +354,19 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
     List<PieChartSectionData> sections = [];
     data.forEach((key, value) {
       final percentage = (value / total * 100);
-      sections.add(PieChartSectionData(
-        value: value,
-        title: '${percentage.toStringAsFixed(1)}%',
-        color: colorGetter(key),
-        radius: 60,
-        titleStyle: TextStyle(
-            fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
-      ));
+      sections.add(
+        PieChartSectionData(
+          value: value,
+          title: '${percentage.toStringAsFixed(1)}%',
+          color: colorGetter(key),
+          radius: 60,
+          titleStyle: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+      );
     });
 
     return Column(
@@ -358,17 +431,22 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Card(
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15)),
+                borderRadius: BorderRadius.circular(15),
+              ),
               elevation: 2,
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text("Chi tiêu theo danh mục",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold)),
+                    Text(
+                      "Chi tiêu theo danh mục",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     SizedBox(height: 15),
                     _buildPieChart(categoryTotals, _getCategoryColor),
                   ],
@@ -381,17 +459,22 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Card(
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15)),
+                borderRadius: BorderRadius.circular(15),
+              ),
               elevation: 2,
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text("Chi tiêu theo thú cưng",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold)),
+                    Text(
+                      "Chi tiêu theo thú cưng",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     SizedBox(height: 15),
                     _buildPieChart(petTotals, _getPetColor),
                   ],
@@ -409,7 +492,10 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
     final formatCurrency = NumberFormat.currency(locale: 'vi_VN', symbol: 'đ');
     if (expenses.isEmpty) {
       return Center(
-        child: Text("Chưa có khoản chi nào", style: TextStyle(color: Colors.grey)),
+        child: Text(
+          "Chưa có khoản chi nào",
+          style: TextStyle(color: Colors.grey),
+        ),
       );
     }
 
@@ -422,7 +508,9 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
 
         return Card(
           margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
           elevation: 2,
           child: ListTile(
             leading: CircleAvatar(
@@ -432,7 +520,10 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                 color: _getCategoryColor(exp.category),
               ),
             ),
-            title: Text(exp.title, style: TextStyle(fontWeight: FontWeight.bold)),
+            title: Text(
+              exp.title,
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -445,17 +536,22 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                       children: [
                         Icon(Icons.pets, size: 14, color: Colors.teal),
                         SizedBox(width: 4),
-                        Text(petName,
-                            style: TextStyle(fontSize: 12, color: Colors.teal)),
+                        Text(
+                          petName,
+                          style: TextStyle(fontSize: 12, color: Colors.teal),
+                        ),
                       ],
                     ),
-                  )
+                  ),
               ],
             ),
             trailing: Text(
               "-${formatCurrency.format(exp.amount)}",
               style: TextStyle(
-                  color: Colors.red, fontWeight: FontWeight.bold, fontSize: 16),
+                color: Colors.red,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
             ),
             isThreeLine: petName != "Dùng chung",
             onLongPress: () {
@@ -508,12 +604,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
             ],
           ),
         ),
-        body: TabBarView(
-          children: [
-            _buildAnalyticsTab(),
-            _buildHistoryTab(),
-          ],
-        ),
+        body: TabBarView(children: [_buildAnalyticsTab(), _buildHistoryTab()]),
         floatingActionButton: FloatingActionButton(
           backgroundColor: Colors.teal,
           onPressed: _showAddExpenseDialog,
